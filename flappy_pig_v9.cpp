@@ -1,5 +1,8 @@
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <fstream>
+#include <cmath>
 using namespace sf;
 
 int y=200;//current y cordinate of pig
@@ -13,17 +16,14 @@ int start = 0; // used to determine if the play has clicked pressed up and the p
 int died = 0; //turs to 1 when the pig dies
 int score = 0; // used to count the score
 int recentscore = 0;
-int highscore = 0;
+float highscore = 0;
 int number=0;/// the number that will be displayed while playing the game in the ones column
 int number2=0;/// the number in the tens column
 int recentnumber=0;
 int recentnumber2=0;
 int highnumber=0;
 int highnumber2=0;
-int base_x=0;
-int base_y=864;
-int base2_x=1120;
-int base2_y=864;
+
 
 
 ////pipe stuff
@@ -44,22 +44,30 @@ int pipe_y4=378;
 
 
 int main(){
+    ///opening the save file///
+    highscore = 28;
+    highnumber2=floor(highscore/10);
+    highnumber=highscore-(highnumber2*10);
+    
+
     /// sets the render window
 
-    RenderWindow window(VideoMode(880, 1056), "The Game!");
-    //sets up textures
-    Texture t1,t2,t3,t4,t5,t6;
+    RenderWindow window(VideoMode(880, 1056), "Flappy Pig!!!");
+    //sets up texturess
+    Texture t1,t2,t3,t4,t5,t6,t7;
     t1.loadFromFile("images/image_files/Background_small.png");
     t2.loadFromFile("images/image_files/Pig.png");
     t3.loadFromFile("images/image_files/Numbers.png");
     t4.loadFromFile("images/image_files/Startup.png");
     t5.loadFromFile("images/image_files/Pipe.png");
     t6.loadFromFile("images/image_files/Base_plate.png");
+    t7.loadFromFile("images/image_files/Gold_pig.png");
 //sets up sprites
     Sprite Background;
     Background.setTexture(t1);
 
-
+    Sprite Gold;
+    Gold.setTexture(t7);
 ///// load sprite textures
 //score while playing
     Sprite Numbers;
@@ -104,11 +112,9 @@ int main(){
     Sprite Base;
     Base.setTexture(t6);
 
-    Sprite Base2;
-    Base2.setTexture(t6);
-
 //scales sprites to fit the screen
     Pig.scale(4,4);
+    Gold.scale(4,4);
     Background.scale(4,4);
     Numbers.scale(8,8);
     Numbers2.scale(8,8);
@@ -124,7 +130,6 @@ int main(){
     Pipe4.scale(4,4);
     Pipe4.rotate(180);
     Base.scale(4,4);
-    Base2.scale(4,4);
 
 /////clock
     float timer=0,timer2=0.5,timer3=0,timer4=0,timer5=0,delay=0.016,pipe_timer=0; 
@@ -236,6 +241,10 @@ int main(){
                     highscore=recentscore;
                 highnumber=recentnumber;
                 highnumber2=recentnumber2;
+                    ofstream myfile;
+                    myfile.open ("example.txt");
+                    myfile << "Writing this to a file.\n";
+                    myfile.close();
             }
         recentscore=0;
         Screennumber=1;
@@ -265,12 +274,10 @@ int main(){
 
         // Pipe 1 Scroller
     if (pipe_timer > 0.005 && start==1 && died == 0) {
-        pipe_x1 -= 1;
-        pipe_x2 -= 1;
-        pipe_x3 -= 1;
-        pipe_x4 -= 1;
-        base_x -= 1;
-        base2_x -= 1;
+        pipe_x1 -= 2;
+        pipe_x2 -= 2;
+        pipe_x3 -= 2;
+        pipe_x4 -= 2;
         pipe_timer = 0;
         if (pipe_x1 < -160) {
             pipe_x1 = 880; 
@@ -284,11 +291,6 @@ int main(){
             pipe_y4 = rand() % 400 + 100;
             pipe_y2 = pipe_y4 + 300;
         }
-        if (base_x < 0) {
-            base_x = 1120;
-        }
-        if (base2_x < 0) {
-            base2_x = 1120;
     }
     /////////draw
         window.clear(Color::White); 
@@ -296,9 +298,17 @@ int main(){
         if (Screennumber==2){  
         window.draw(Background);
     ///pig settings
+    if(recentscore<=highscore){
         Pig.setTextureRect(IntRect(0,0,30,30));//sets where the image starts and size
         Pig.setPosition(x,y);//sets location of pig
         window.draw(Pig);
+    }
+    else{
+        Gold.setTextureRect(IntRect(0,0,30,30));
+        Gold.setPosition(x,y);
+        window.draw(Gold);
+    }
+
     // Pipe 1 Settings
         Pipe1.setPosition(pipe_x1,pipe_y1);
         window.draw(Pipe1);
@@ -311,11 +321,8 @@ int main(){
     // Pipe 4 Settings
         Pipe4.setPosition(pipe_x4,pipe_y4);
         window.draw(Pipe4);
-    // Base Settings
-        Base.setPosition(base_x,base_y);
-        window.draw(Base);
-    // Base 2 Settings
-        Base2.setPosition(base2_x,base2_y);
+    // Base
+        Base.setPosition(0,864);
         window.draw(Base);
 
     //// number settings
@@ -364,3 +371,4 @@ int main(){
 }
 //g++ -c flappy_pig_v3.cpp -I/usr/local/Cellar/sfml/2.5.1_2/include
 //g++ flappy_pig_v3.o -o sfml-app -L/usr/local/Cellar/sfml/2.5.1_2/lib -lsfml-graphics -lsfml-window -lsfml-system
+
