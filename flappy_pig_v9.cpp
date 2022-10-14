@@ -284,6 +284,11 @@ int main(){
             pipe_y4 = rand() % 400 + 100;
             pipe_y2 = pipe_y4 + 300;
         }
+        if (base_x < 0) {
+            base_x = 1120;
+        }
+        if (base2_x < 0) {
+            base2_x = 1120;
     }
     /////////draw
         window.clear(Color::White); 
